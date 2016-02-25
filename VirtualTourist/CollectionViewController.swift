@@ -16,6 +16,7 @@ class CollectionViewController: UIViewController {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var bottomButton: UIBarButtonItem!
     @IBOutlet weak var noImagesLabel: UILabel!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     var pin: Pin!
     
@@ -103,6 +104,10 @@ class CollectionViewController: UIViewController {
     }
     
     func requestPhotos(page: Int) {
+        // Show Activity Indicator
+        activityIndicator.hidden = false
+        bottomButton.enabled = false
+        
         FlickrClient.sharedInstance().searchPhotosNear(pin, page: page) {
             success, error in
             
@@ -114,8 +119,12 @@ class CollectionViewController: UIViewController {
     }
     
     func refreshInterface() {
-        if pin.searchInfo!.totalNumberOfPages == 0 {
-            dispatch_async(dispatch_get_main_queue()) {
+        dispatch_async(dispatch_get_main_queue()) {
+            // Hide Activity indicator
+            self.activityIndicator.hidden = true
+            self.bottomButton.enabled = true
+            
+            if self.pin.searchInfo!.totalNumberOfPages == 0 {
                 self.noImagesLabel.hidden = false
             }
         }
@@ -132,13 +141,16 @@ class CollectionViewController: UIViewController {
     
     func getNewCollection() {
         
-        // Delete all stored pictures
-        for picture in fetchedResultsController.fetchedObjects as! [Picture] {
-            picture.image = nil
-            sharedContext.deleteObject(picture)
-        }
+        sharedContext.performBlockAndWait {
         
-        CoreDataStackManager.sharedInstance().saveContext()
+            // Delete all stored pictures
+            for picture in self.fetchedResultsController.fetchedObjects as! [Picture] {
+                picture.image = nil
+                self.sharedContext.deleteObject(picture)
+            }
+            
+            CoreDataStackManager.sharedInstance().saveContext()
+        }
         
         // Get new page to consult
         let randomPage = getRandomPage(Int(pin.searchInfo!.totalNumberOfPages))
@@ -152,12 +164,15 @@ class CollectionViewController: UIViewController {
             photosToDelete.append(fetchedResultsController.objectAtIndexPath(indexPath) as! Picture)
         }
         
-        for photo in photosToDelete {
-            photo.image = nil
-            sharedContext.deleteObject(photo)
+        sharedContext.performBlockAndWait {
+            for photo in photosToDelete {
+                photo.image = nil
+                self.sharedContext.deleteObject(photo)
+            }
+            
+            CoreDataStackManager.sharedInstance().saveContext()
         }
         
-        CoreDataStackManager.sharedInstance().saveContext()
         selectedIndexes = [NSIndexPath]()
         updateBottomButton()
     }
@@ -244,10 +259,11 @@ extension CollectionViewController: UICollectionViewDataSource, UICollectionView
                     let image = UIImage(data: data)
                     
                     // update the model, so that the infrmation gets cashed
-                    photo.image = image
+                    self.sharedContext.performBlockAndWait {
+                        photo.image = image
+                    }
                     
                     // update the cell later, on the main thread
-                    
                     dispatch_async(dispatch_get_main_queue()) {
                         cell.image.image = image
                     }

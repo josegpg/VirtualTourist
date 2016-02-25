@@ -41,6 +41,7 @@ extension FlickrClient {
         static let Method = "method"
         static let Extras = "extras"
         static let Page = "page"
+        static let PerPage = "per_page"
         
     }
     

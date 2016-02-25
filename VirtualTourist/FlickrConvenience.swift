@@ -23,28 +23,33 @@ extension FlickrClient {
             ParameterKeys.Method: ParametersValues.PhotosSearchMethod,
             ParameterKeys.NoJsonCallback: ParametersValues.DisableJsonCallBack,
             ParameterKeys.Extras: ParametersValues.MediaURL,
-            ParameterKeys.Page: page
+            ParameterKeys.Page: page,
+            ParameterKeys.PerPage: 30
         ]
         
         taskForGETMethod("", parameters: parameters) { JSONResult, error in
             if let error = error {
                 completionHandler(success: false, error: error)
             } else if let response = PhotosResponse(dictionary: JSONResult as! [String : AnyObject]) {
+                let context = CoreDataStackManager.sharedInstance().managedObjectContext
                 
-                // Save photos
-                for dictionary in response.photosDictionaries {
-                    let picture = Picture(dictionary: dictionary, context: CoreDataStackManager.sharedInstance().managedObjectContext)
-                    picture.relatedPin = pin
+                context.performBlock {
+                    // Save photos
+                    for dictionary in response.photosDictionaries {
+                        let picture = Picture(dictionary: dictionary, context: context)
+                        picture.relatedPin = pin
+                    }
+                    
+                    // Save Search Info
+                    let searchInfo = SearchInfo(totalNumberOfPages: response.totalPages, photosPerPage: response.photosPerPage, context: context)
+                    searchInfo.relatedPin = pin
+                    
+                    // Save context
+                    CoreDataStackManager.sharedInstance().saveContext()
+                    
+                    completionHandler(success: true, error: nil)
                 }
-                
-                // Save Search Info
-                let searchInfo = SearchInfo(totalNumberOfPages: response.totalPages, photosPerPage: response.photosPerPage, context: CoreDataStackManager.sharedInstance().managedObjectContext)
-                searchInfo.relatedPin = pin
-                
-                // Save context
-                CoreDataStackManager.sharedInstance().saveContext()
-                
-                completionHandler(success: true, error: nil)
+            
             } else {
                 completionHandler(success: false, error: APIClient.createError("searchFlickrPhotos parsing", msg: "Could not parse searchFlickrPhotos"))
             }
@@ -55,7 +60,6 @@ extension FlickrClient {
     func taskForGetImage(url: String, completionHandler: (imageData: NSData?, error: NSError?) ->  Void) -> NSURLSessionDataTask {
         let url = NSURL(string: url)!
         let request = NSMutableURLRequest(URL: url)
-        
         
         /* Make the request */
         let task = session.dataTaskWithRequest(request) {data, response, downloadError in

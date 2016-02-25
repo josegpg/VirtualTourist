@@ -78,7 +78,6 @@ class MapViewController: UIViewController {
         
         if recognizer.state == .Ended {
             saveCurrentPin()
-            currentAddingPin = nil
         } else if recognizer.state == .Began {
             let annotation = CustomAnnotation()
             annotation.coordinate = coordinate
@@ -114,19 +113,24 @@ class MapViewController: UIViewController {
     }
     
     func saveCurrentPin() {
-        if let currentAddingPin = currentAddingPin {
-            // Store Pin in core data
-            let newPin = Pin(lat: currentAddingPin.coordinate.latitude, lng: currentAddingPin.coordinate.longitude, context: sharedContext)
-            
-            currentAddingPin.arrayIndex = pins.count
-            
-            // Add the new pin to the array
-            pins.append(newPin)
-            
-            // Get info if possible
-            FlickrClient.sharedInstance().searchPhotosNear(newPin, page: 0) { success, error in }
-            
-            CoreDataStackManager.sharedInstance().saveContext()
+        if let currentAddingPin = self.currentAddingPin {
+            sharedContext.performBlock {
+                
+                // Store Pin in core data
+                let newPin = Pin(lat: currentAddingPin.coordinate.latitude, lng: currentAddingPin.coordinate.longitude, context: self.sharedContext)
+                
+                currentAddingPin.arrayIndex = self.pins.count
+                
+                // Add the new pin to the array
+                self.pins.append(newPin)
+                
+                // Get info if possible
+                FlickrClient.sharedInstance().searchPhotosNear(newPin, page: 0) { success, error in }
+                
+                CoreDataStackManager.sharedInstance().saveContext()
+                
+                self.currentAddingPin = nil
+            }
         }
     }
     

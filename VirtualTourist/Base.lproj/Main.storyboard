@@ -129,6 +129,9 @@
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="iFB-ZL-nQ6">
+                                <rect key="frame" x="177" y="324" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -146,8 +149,10 @@
                             <constraint firstAttribute="trailing" secondItem="W5W-2y-VTU" secondAttribute="trailing" id="eU4-Vd-cvX"/>
                             <constraint firstItem="W5W-2y-VTU" firstAttribute="leading" secondItem="5xK-Gx-V0D" secondAttribute="leading" id="fYf-iJ-yfF"/>
                             <constraint firstItem="5yC-ku-RLA" firstAttribute="top" secondItem="aG4-dk-dd7" secondAttribute="bottom" id="jLS-tL-AfK"/>
+                            <constraint firstItem="iFB-ZL-nQ6" firstAttribute="centerY" secondItem="5xK-Gx-V0D" secondAttribute="centerY" id="sPb-x4-nkp"/>
                             <constraint firstItem="mC3-mw-5J0" firstAttribute="top" secondItem="atb-9W-vTc" secondAttribute="bottom" id="ucZ-vM-tul"/>
                             <constraint firstItem="aG4-dk-dd7" firstAttribute="leading" secondItem="5xK-Gx-V0D" secondAttribute="leading" id="vEe-gA-dzn"/>
+                            <constraint firstItem="iFB-ZL-nQ6" firstAttribute="centerX" secondItem="5xK-Gx-V0D" secondAttribute="centerX" id="xZB-ve-oOB"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
@@ -161,6 +166,7 @@
                     </navigationItem>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>
+                        <outlet property="activityIndicator" destination="iFB-ZL-nQ6" id="9k2-YS-1WU"/>
                         <outlet property="bottomButton" destination="VUO-Cr-3wS" id="ObS-pM-eGv"/>
                         <outlet property="collectionView" destination="aG4-dk-dd7" id="OZM-7k-1pN"/>
                         <outlet property="mapView" destination="mC3-mw-5J0" id="Hxz-5q-sd6"/>
