@@ -32,8 +32,8 @@ extension FlickrClient {
             } else if let response = PhotosResponse(dictionary: JSONResult as! [String : AnyObject]) {
                 
                 // Save photos
-                for (index, dictionary) in response.photosDictionaries.enumerate() {
-                    let picture = Picture(dictionary: dictionary, id: index, context: CoreDataStackManager.sharedInstance().managedObjectContext)
+                for dictionary in response.photosDictionaries {
+                    let picture = Picture(dictionary: dictionary, context: CoreDataStackManager.sharedInstance().managedObjectContext)
                     picture.relatedPin = pin
                 }
                 

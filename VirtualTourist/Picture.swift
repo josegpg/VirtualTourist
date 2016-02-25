@@ -15,9 +15,10 @@ class Picture: NSManagedObject {
     struct Keys {
         static let Path = "url_m"
         static let Title = "title"
+        static let Id = "id"
     }
     
-    @NSManaged var id: NSNumber
+    @NSManaged var id: String
     @NSManaged var path: String
     @NSManaged var title: String
     @NSManaged var relatedPin: Pin
@@ -26,7 +27,7 @@ class Picture: NSManagedObject {
         super.init(entity: entity, insertIntoManagedObjectContext: context)
     }
     
-    init(dictionary: [String: AnyObject], id: NSNumber, context: NSManagedObjectContext) {
+    init(dictionary: [String: AnyObject], context: NSManagedObjectContext) {
         
         // Core Data
         let entity =  NSEntityDescription.entityForName("Picture", inManagedObjectContext: context)!
@@ -35,11 +36,11 @@ class Picture: NSManagedObject {
         // Dictionary
         path = dictionary[Keys.Path] as! String
         title = dictionary[Keys.Title] as! String
-        self.id = id
+        id = dictionary[Keys.Id] as! String
     }
     
     var image: UIImage? {
-        get { return FlickrClient.Caches.imageCache.imageWithIdentifier(path) }
-        set { FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: path) }
+        get { return FlickrClient.Caches.imageCache.imageWithIdentifier(id) }
+        set { FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: id) }
     }
 }
