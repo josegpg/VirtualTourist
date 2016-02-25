@@ -39,6 +39,11 @@ class Picture: NSManagedObject {
         id = dictionary[Keys.Id] as! String
     }
     
+    override func prepareForDeletion() {
+        // Triggers the deletion of the stored image
+        image = nil
+    }
+    
     var image: UIImage? {
         get { return FlickrClient.Caches.imageCache.imageWithIdentifier(id) }
         set { FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: id) }

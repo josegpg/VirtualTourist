@@ -145,7 +145,6 @@ class CollectionViewController: UIViewController {
         
             // Delete all stored pictures
             for picture in self.fetchedResultsController.fetchedObjects as! [Picture] {
-                picture.image = nil
                 self.sharedContext.deleteObject(picture)
             }
             
@@ -166,7 +165,6 @@ class CollectionViewController: UIViewController {
         
         sharedContext.performBlockAndWait {
             for photo in photosToDelete {
-                photo.image = nil
                 self.sharedContext.deleteObject(photo)
             }
             
